@@ -1,0 +1,75 @@
+---
+- name: Consul | Install Prerequisites
+  become: yes
+  apt:
+    pkg: [ unzip, ca-certificates  ]
+
+- name: Consul | Ensure Group
+  group:
+    name: "{{ consul_group }}"
+
+- name: Consul | Ensure Consul User
+  user:
+    name: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    create_home: no
+
+- name: Consul | Ensure Consul skeleton path
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+  with_items:
+    - "{{ consul_bin_dir }}"
+    - "{{ consul_config_dir }}"
+    - "{{ consul_data_dir }}"
+    - "{{ consul_log_dir }}"
+
+- name: Consul | Download binary
+  get_url:
+    url: "{{ consul_url }}"
+    dest: "{{ consul_tmp_dir }}"
+    checksum: "{{ consul_checksum }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+
+- name: Consul | Extract Consul
+  unarchive:
+    src: "{{ consul_tmp_dir }}/{{ consul_package }}"
+    dest: "{{ consul_bin_dir }}"
+    owner: "{{ consul_user }}"
+    group: "{{ consul_group }}"
+    remote_src: yes
+  notify: restart consul
+
+- name: Consul | Copy Config
+  template:
+    src: server.json.j2
+    dest: "{{ consul_config_dir }}/server.json"
+  when: consul_role == 'server'
+
+- name: Consul | Copy Config 
+  template:
+    src: client.json.j2
+    dest: "{{ consul_config_dir }}/client.json"
+  when: consul_role == 'client'
+
+- name: Consul | Copy Systemd file
+  template: 
+    src: consul.service.j2
+    dest: "{{ consul_sys }}"
+  notify: restart consul 
+
+- name: Consul | Link binary
+  file:
+    src: "{{ consul_bin_dir }}/consul"
+    dest: /usr/bin/consul
+    state: link
+
+- name: Consul | Enable
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: consul 
+    state: started

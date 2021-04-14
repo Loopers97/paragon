@@ -1,0 +1,5 @@
+consul_url: 'https://releases.hashicorp.com/consul/{{ consul_version }}/{{ consul_package }}'
+consul_package: 'consul_{{ consul_version }}_linux_amd64.zip'
+
+consul_version: 1.9.1
+consul_checksum: sha256:9ba45ec6eb3e762444f077ae06e407ca5161d46785d725d7b5ea0c4d5cd5a99b

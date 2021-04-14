@@ -1,0 +1,10 @@
+---
+unseal_keys_dir_output: "{{ playbook_dir }}/unsealKey"
+root_token_dir_output: "{{ playbook_dir }}/rootKey"
+
+vault_temp_dir: '/tmp/{{ vault_package }}'
+
+vault_user: "vault"
+vault_group: "vault"
+vault_config_path: "/etc/vault.hcl"
+vault_sys: /lib/systemd/system/vault.service

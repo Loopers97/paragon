@@ -1,0 +1,31 @@
+---
+
+# - name: Ansible delete file glob
+#     find:
+#       paths: /
+#       patterns: consul*
+#     register: files_to_delete
+
+#   - name: Ansible remove file glob
+#     file:
+#       path: "{{ item.path }}"
+#       state: absent
+#     with_items: "{{ files_to_delete.files }}"
+
+- name: Delete
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - /etc/nomad
+    - /opt/nomad
+    - /opt/consul
+    - /etc/consul
+    - /var/log/consul
+    - /lib/systemd/system/consul.service
+    - /lib/systemd/system/nomad.service
+
+- name: Reboot
+  become: yes
+  reboot:

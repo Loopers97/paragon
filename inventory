@@ -1,0 +1,23 @@
+
+[service]
+10.123.13.181
+10.123.13.182
+10.123.13.183
+10.123.13.184
+
+[server]
+10.123.13.181
+
+[consul_rest]
+10.123.13.182
+10.123.13.183
+10.123.13.184
+
+#Note that you should never point directly at a Consul server
+[nomad_server]
+10.123.13.182
+
+[nomad_rest]
+10.123.13.181
+10.123.13.183
+10.123.13.184

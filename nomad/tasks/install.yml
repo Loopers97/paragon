@@ -1,0 +1,75 @@
+---
+- name: Nomad | Ensure Group
+  group:
+    name: "{{ nomad_group }}"
+
+- name: Nomad | Ensure Nomad User
+  user:
+    name: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    create_home: no
+
+- name: Nomad | Ensure Nomad skeleton path
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+  with_items:
+    - "{{ nomad_bin_dir }}"
+    - "{{ nomad_config_dir }}"
+    - "{{ nomad_data_dir }}"
+    - "{{ nomad_log_dir }}"
+
+- name: Nomad | Download binary
+  get_url:
+    url: "{{ nomad_url }}"
+    dest: "{{ nomad_tmp_dir }}"
+    checksum: "{{ nomad_checksum }}"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+
+- name: Nomad | Extract nomad
+  unarchive:
+    src: "{{ nomad_tmp_dir }}/{{ nomad_package }}"
+    dest: "{{ nomad_bin_dir }}"
+    owner: "{{ nomad_user }}"
+    group: "{{ nomad_group }}"
+    remote_src: yes
+  notify: restart nomad
+
+- name: nomad | Link binary
+  file:
+    src: "{{ nomad_bin_dir }}/nomad"
+    dest: /usr/bin/nomad
+    state: link
+
+- name: Nomad | Setup System File
+  template:
+    src: nomad.service.j2
+    dest: "{{ nomad_system }}"
+
+- name: Nomad | Setup Base config
+  template:
+    src: nomad.hcl.j2
+    dest: "{{ nomad_config_dir }}/nomad.hcl"
+
+- name: Nomad | Set Client config
+  template:
+    src:  client.hcl.j2
+    dest: "{{ nomad_config_dir }}/client.hcl"
+  when: nomad_node_role != 'server'
+
+- name: Nomad | Set Server config
+  template:
+    src:  server.hcl.j2
+    dest: "{{ nomad_config_dir }}/server.hcl"
+  when: nomad_node_role == 'server'
+
+- name: Nomad | Reload system 
+  systemd:
+    name: nomad
+    daemon_reload: yes
+    enabled: yes
+    state: restarted
+

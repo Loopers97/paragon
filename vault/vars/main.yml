@@ -1,0 +1,5 @@
+vault_url: 'https://releases.hashicorp.com/vault/{{vault_version}}/vault_{{vault_version}}_linux_amd64.zip'
+vault_package: 'vault_{{ vault_version }}_linux_amd64.zip'
+
+vault_version: 1.7.0
+vault_checksum: sha256:aad2f50635ef4e3f2495b0b6c855061c4047c795821fda886b326c1a71c71c35

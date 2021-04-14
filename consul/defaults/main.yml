@@ -1,0 +1,18 @@
+consul_user: consul
+consul_group: consul
+consul_role: client
+
+consul_force_install: true
+consul_enable_script_check: true
+
+consul_tmp_dir: "/tmp"
+consul_bin_dir: "/etc/consul/bin"
+consul_config_dir: "/etc/consul/consul.d"
+consul_data_dir: "/etc/consul/data"
+consul_syslog: false
+
+consul_log_dir: /var/log/consul
+consul_log_file: "{{ consul_log_dir }}/consul.log"
+consul_log_level: INFO
+
+consul_sys: /lib/systemd/system/consul.service

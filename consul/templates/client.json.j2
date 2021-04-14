@@ -1,0 +1,8 @@
+{
+    "datacenter": "dc1",
+    "data_dir": "{{ consul_data_dir }}",
+    "retry_join": ["{{ master_ip }}"],
+    "ports": {
+        "grpc": 8502
+    }
+}

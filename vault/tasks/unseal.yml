@@ -1,0 +1,27 @@
+- name: Vault | Parse output of vault init to jsonfile
+  copy:
+    dest: “{{ vault_unseal_keys_dir_output }}/{{ vault_environment }}_vault_init_output.json”
+    content: “{{ vault_init_results.stdout }}”
+    delegate_to: localhost
+
+- name: Vault |  Encrypt the output file with the key vault_init_results
+  command: ansible-vault {{ vault_unseal_keys_dir_output }}/{{ vault_environment }}_vault_init_output.json encrypt — vault-id {{ vault_environment }}@{{ vault_unseal_passfile }}
+  delegate_to: localhost
+
+- name: Vault | Encrypt the output file with the key vault_init_results
+  command: ansible-vault {{ vault_unseal_keys_dir_output }}/{{ vault_environment }}_vault_init_output.json view — vault-id {{ vault_environment }}@{{ vault_unseal_passfile }}
+  delegate_to: localhost
+  register: vault_unseal_keys
+
+- name: Vault | Parse output of vault init
+  set_fact:
+   vault_unseal_keys_parsed: “{{ vault_unseal_keys.stdout | from_json }}”
+   delegate_to: localhost
+
+- name: Vault | Unseal vault with unseal keys
+  shell: |
+    vault operator unseal {{ item.1 }}
+  environment:
+  VAULT_ADDR: “http://127.0.0.1:8200"
+  with_indexed_items: “{{ vault_unseal_keys_parsed.unseal_keys_hex }}”
+  run_once: yes

@@ -1,0 +1,29 @@
+---
+- hosts: server
+  vars:
+    - consul_role: server
+  roles:
+    - consul
+
+- hosts: consul_rest
+  vars: 
+    - master_ip: "10.123.13.181"
+  roles:
+    - consul
+
+- hosts: nomad_server
+  vars:
+    - nomad_node_role: 'server'
+    - nomad_node_name: 'nomad'
+  roles:
+    - nomad
+  
+- hosts: nomad_rest
+  roles:
+    - nomad
+
+
+# Burn it all down and go to the beach
+# - hosts: service
+#   roles:
+#     - delete

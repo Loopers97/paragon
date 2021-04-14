@@ -1,0 +1,16 @@
+{
+    "datacenter": "dc1",
+    "data_dir": "{{ consul_data_dir }}",
+    "server": true,
+    "bootstrap_expect": 1,
+    "ui_config": {
+        "enabled": true
+    },
+    "client_addr": "0.0.0.0",
+    "ports": {
+        "grpc": 8502
+    },
+    "connect": {
+        "enabled": true
+    }
+}
